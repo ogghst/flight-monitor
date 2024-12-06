@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Monitor {
+  id          String   @id @default(uuid())
+  credentials String   // Store Amadeus credentials as JSON string
+  details     String   // Store flight search details as JSON string
+  flights     Flight[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Flight {
+  id           String   @id @default(uuid())
+  amadeusId    String   
+  airline      String
+  price        Float
+  priceHistory String   @default("[]") // Store as JSON string
+  outbound     String   // Store as JSON string
+  return       String?  // Store as JSON string
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  monitorId    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([amadeusId])
+  @@index([monitorId])
+}
